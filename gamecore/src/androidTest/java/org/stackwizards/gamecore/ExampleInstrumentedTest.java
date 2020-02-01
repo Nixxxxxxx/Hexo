@@ -1,4 +1,4 @@
-package org.stackwizards.basegame;
+package org.stackwizards.gamecore;
 
 import android.content.Context;
 
@@ -22,6 +22,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
-        assertEquals("org.stackwizards.basegame", appContext.getPackageName());
+        assertEquals("org.stackwizards.gamecore.test", appContext.getPackageName());
     }
 }
