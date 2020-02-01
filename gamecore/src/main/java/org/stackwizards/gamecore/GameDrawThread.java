@@ -8,16 +8,15 @@ import android.view.SurfaceHolder;
 
 class GameDrawThread extends Thread {
 
-    SurfaceHolder surfaceHolder;
+    private SurfaceHolder surfaceHolder;
     private boolean isRunning;
-    long startTime, loopTime;
-    long DELAY = GameConstant.UPDATE_DELAY;
-
+    private long startTime, loopTime;
+    private long DELAY = GameConstant.UPDATE_DELAY;
     private HexBoard _Hexboard;
 
     public GameDrawThread(Context context, SurfaceHolder surfaceHolder) {
         this.surfaceHolder = surfaceHolder;
-        _Hexboard = new HexBoard(context,13);
+        _Hexboard = new HexBoard(context,9);
         isRunning = true;
     }
 
@@ -30,13 +29,12 @@ class GameDrawThread extends Thread {
                 synchronized (surfaceHolder) {
                     try {
 //                        AppConstants.getGameEngine().drawAll(canvas);
+                          _Hexboard.clearBoard(canvas);
                           _Hexboard.drawBoard(canvas);
                     }catch (Exception e){
 
                     }
-
                     surfaceHolder.unlockCanvasAndPost(canvas);
-
                 }
             }
             loopTime = SystemClock.uptimeMillis() - startTime;
@@ -48,6 +46,10 @@ class GameDrawThread extends Thread {
                 }
             }
         }
+    }
+
+    public void GetTouchEvent(int x, int y){
+        _Hexboard.setFillHexGrid(x,y);
     }
 
     public boolean isRunning() {

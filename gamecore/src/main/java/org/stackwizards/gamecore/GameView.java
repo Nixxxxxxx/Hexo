@@ -21,7 +21,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         SurfaceHolder holder = getHolder();
         holder.addCallback(this);
         setFocusable(true);
-        gameDrawThread = new GameDrawThread(context,holder);
+        gameDrawThread = new GameDrawThread(context, holder);
         gameUpdateThread = new GameUpdateThread();
     }
 
@@ -29,7 +29,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public boolean onTouchEvent(MotionEvent event) {
         int action = event.getAction();
         if (action == MotionEvent.ACTION_DOWN) {
-//            AppConstants.getGameEngine().getButtonEvent((int)event.getX(), (int)event.getY());
+            gameDrawThread.GetTouchEvent((int) event.getX(), (int) event.getY());
         }
         return true;
     }
@@ -38,7 +38,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         if (!gameDrawThread.isRunning()) {
-            gameDrawThread = new GameDrawThread(_Context,holder);
+            gameDrawThread = new GameDrawThread(_Context, holder);
             gameDrawThread.start();
         } else {
             gameDrawThread.start();
