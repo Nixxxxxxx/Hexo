@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import androidx.appcompat.app.AppCompatActivity;
+
+import org.stackwizards.GameCore;
 import org.stackwizards.coreengine.GameView;
 import org.stackwizards.coreengine.Interfaces.IGameObject;
 import org.stackwizards.gridboard.HexBoard;
@@ -25,9 +27,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        GameCore.initialisation(this);
+
         int width = GetScreenWidth(this);
 
-        HexBoard hexBoard = new HexBoard(width,13,13);
+        HexBoard hexBoard = new HexBoard(width,13);
         List<IGameObject> gameObjects = new ArrayList<>();
         gameObjects.add(hexBoard);
 

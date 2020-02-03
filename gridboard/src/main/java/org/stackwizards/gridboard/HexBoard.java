@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Path;
 import android.util.Log;
 
+import org.stackwizards.GameCore;
 import org.stackwizards.coreengine.GameConstant;
 import org.stackwizards.coreengine.Interfaces.IGameObject;
 import org.stackwizards.coreengine.Interfaces.ITouchEventHandler;
@@ -18,28 +19,11 @@ public class HexBoard implements IGameObject, ITouchEventHandler {
     private boolean isAlive;
     private List<IGameObject> hexs ;
 
-//
-//    public void drawBoard(Canvas canvas) {
-//        int i, j;
-//
-//        for (i = 0; i < boardCols; ++i) {
-//            for (j = 0; j < boardRows; ++j) {
-//
-//                float x = (i * hexRectangleWidth + ((j % 2) * hexRadius)) + XOffset;
-//                float y = (j * (sideLength + hexHeight)) + YOffset;
-//                drawHexagon(canvas, x, y,
-//                        getSelectedHexGrid(i * hexRectangleWidth + ((j % 2) * hexRadius) + hexRadius,
-//                                j * (sideLength + hexHeight) + hexRadius + 6)
-//                );
-//            }
-//        }
-//    }
-
-
-    public HexBoard(int width, int rows, int cols) {
+    public HexBoard(int width, int rows) {
         priority = 0;
         isAlive =  true;
         hexs = new ArrayList<>();
+        int cols = rows;
         int  hexRadius = width / (2 * (cols + 1));
         for (int i = 0; i < cols; ++i) {
             for (int j = 0; j < rows; ++j) {
@@ -80,6 +64,7 @@ public class HexBoard implements IGameObject, ITouchEventHandler {
         for(IGameObject hex : hexs){
             if(((HexGridElement)hex).getSelectedHexGrid(x,y)){
                 ((HexGridElement)hex).SetFill(true);
+                GameCore.soundBank.Play("hit");
             }
         }
     }
