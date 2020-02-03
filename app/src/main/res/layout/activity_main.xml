@@ -9,12 +9,23 @@
     android:fitsSystemWindows="false"
     tools:openDrawer="start">
 
-    <LinearLayout
-        android:id="@+id/surface"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-    </LinearLayout>
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:id="@+id/surface"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:orientation="vertical"></LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"

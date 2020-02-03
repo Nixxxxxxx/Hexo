@@ -1,2 +1,2 @@
-include ':app', ':gamecore'
+include ':app', ':gamecore', ':coreengine', ':gridboard'
 rootProject.name='BaseGame'
