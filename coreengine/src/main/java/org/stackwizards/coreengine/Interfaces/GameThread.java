@@ -1,22 +1,29 @@
-package org.stackwizards.gamecore;
+package org.stackwizards.coreengine.Interfaces;
 
+import android.graphics.Canvas;
 import android.os.SystemClock;
 import android.util.Log;
 
-public class GameUpdateThread extends Thread {
-    private boolean isRunning;
-    long startTime, loopTime;
-    long DELAY = GameConstant.UPDATE_DELAY;
+import org.stackwizards.coreengine.GameConstant;
 
-    public GameUpdateThread() {
-        isRunning = true;
+public class GameThread extends Thread {
+    private boolean isRunning;
+    private long startTime, loopTime;
+    private long DELAY = GameConstant.UPDATE_DELAY;
+    private IGameObject gameObject;
+
+    private Canvas canvas;
+
+    public GameThread(IGameObject gameObject, Canvas canvas) {
+        this.gameObject = gameObject;
+        this.canvas = canvas;
     }
 
     @Override
     public void run() {
         while (isRunning) {
             startTime = SystemClock.uptimeMillis();
-//            AppConstants.getGameEngine().updateAll();
+            gameObject.Draw(canvas);
             loopTime = SystemClock.uptimeMillis() - startTime;
             if (loopTime < DELAY) {
                 try {
@@ -27,6 +34,7 @@ public class GameUpdateThread extends Thread {
             }
         }
     }
+
 
     public boolean isRunning() {
         return isRunning;

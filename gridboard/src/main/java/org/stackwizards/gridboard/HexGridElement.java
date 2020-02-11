@@ -4,22 +4,28 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.util.Log;
 
+import org.stackwizards.coreengine.GameConstant;
 import org.stackwizards.coreengine.Interfaces.IGameObject;
 import org.stackwizards.coreengine.PaintConstant;
 
 import static java.lang.StrictMath.abs;
 
 public class HexGridElement implements IGameObject {
-    private int priority;
-    private boolean isAlive;
-    private int col, row;
-    private float cX, cY;
-    private int YOffset;
-    private int XOffset = 30;
-    private float X, Y;
-    private float sideLength, hexHeight, hexRadius, hexRectangleHeight, hexRectangleWidth, hexagonAngle = (float) 0.523598776; // 30 degrees in radians
-    private boolean isFill;
+    protected int priority;
+    protected boolean isAlive;
+    protected int col, row;
+    protected float cX, cY;
+    protected int YOffset = 15 ;
+    protected int XOffset = 30;
+    protected float X, Y;
+    protected float sideLength, hexHeight, hexRadius, hexRectangleHeight, hexRectangleWidth, hexagonAngle = (float) 0.523598776; // 30 degrees in radians
+    protected boolean isFill;
+
+
+    private Paint paintCircle;
+    protected Paint painBorder = null;
 
     public HexGridElement(int col, int row, float hexRadius) {
         this.col = col;
@@ -28,18 +34,28 @@ public class HexGridElement implements IGameObject {
         this.sideLength = (float) (hexRadius / Math.cos(hexagonAngle));
         this.hexHeight = (float) (Math.sin(hexagonAngle) * sideLength);
         this.hexRectangleHeight = sideLength + 2 * hexHeight;
-        this.YOffset = (int) hexRectangleHeight / 2;
+//        this.YOffset = (int) hexRectangleHeight / 2;
         this.hexRectangleWidth = 2 * hexRadius;
         this.X = (col * hexRectangleWidth + ((row % 2) * hexRadius)) + XOffset;
         this.Y = (row * (sideLength + hexHeight)) + YOffset;
         this.cX = (col * hexRectangleWidth + ((row % 2) * hexRadius) + hexRadius) + XOffset;
         this.cY = (row * (sideLength + hexHeight) + hexRadius + 6) + YOffset;
+
+        priority = 0;
+        isAlive = true;
+
+        paintCircle = new Paint();
+        paintCircle.setColor(Color.YELLOW);
+        paintCircle.setStyle(Paint.Style.FILL);
     }
+
+    public void SetPaintBorder(Paint paint){
+        this.painBorder = paint;
+    }
+
 
     @Override
     public void Update() {
-        priority = 0;
-        isAlive = true;
     }
 
     @Override
@@ -52,15 +68,15 @@ public class HexGridElement implements IGameObject {
         p.lineTo(X, Y + sideLength + hexHeight);
         p.lineTo(X, Y + hexHeight);
         p.close();
-        canvas.drawPath(p, PaintConstant.PaintWhite());
+        canvas.drawPath(p, painBorder);
 
-        if (isFill) {
-            PaintConstant.PaintHexSelected().setStyle(Paint.Style.FILL);
-        } else {
-            PaintConstant.PaintHexSelected().setStyle(Paint.Style.STROKE);
-        }
-        canvas.drawCircle(X + hexRadius, Y + hexRadius + 6, hexHeight, PaintConstant.PaintHexSelected());
-        canvas.drawText("xx", X + (hexRadius/2), Y + hexRadius + 18, PaintConstant.PaintWhite());
+//        if (isFill) {
+//            PaintConstant.PaintHexSelected().setStyle(Paint.Style.FILL);
+//        } else {
+//            PaintConstant.PaintHexSelected().setStyle(Paint.Style.STROKE);
+//        }
+        canvas.drawCircle(X + hexRadius, Y + hexRadius + 6, hexHeight + 18, paintCircle);
+//        canvas.drawText("xx", X + (hexRadius/2), Y + hexRadius + 18, PaintConstant.PaintWhite());
     }
 
     @Override
@@ -74,13 +90,30 @@ public class HexGridElement implements IGameObject {
     }
 
     public boolean getSelectedHexGrid(float x, float y) {
+//        Log.i(GameConstant.TAG, "How far touching me at: " +( abs(cX - x) < sideLength / 2) + " " + (abs(cY - y) < sideLength / 2));
+
         if (abs(cX - x) < sideLength / 2 && abs(cY - y) < sideLength / 2) {
             return true;
         }
         return false;
     }
 
-    public void SetFill(boolean status){
-        isFill = status;
+    public boolean isHexGrid(int row, int col) {
+        if (this.row==row && this.col==col) {
+            return true;
+        }
+        return false;
+    }
+
+
+    public void ToggleFill(){
+        if(isFill){
+            paintCircle.setColor(Color.RED);
+            isFill = !isFill;
+        }else {
+            paintCircle.setColor(Color.GREEN);
+            isFill = !isFill;
+        }
+//        isFill = status;
     }
 }

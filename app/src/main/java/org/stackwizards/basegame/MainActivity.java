@@ -1,18 +1,17 @@
 package org.stackwizards.basegame;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.stackwizards.GameCore;
+import org.stackwizards.bitmap.BitmapBank;
 import org.stackwizards.coreengine.GameView;
 import org.stackwizards.coreengine.Interfaces.IGameObject;
-import org.stackwizards.gridboard.HexBoard;
+import org.stackwizards.gridboard.GameBoard;
+import org.stackwizards.gridboard.PanelBoard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,22 +27,58 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         GameCore.initialisation(this);
-
         int width = GetScreenWidth(this);
 
-        HexBoard hexBoard = new HexBoard(width,13);
-        List<IGameObject> gameObjects = new ArrayList<>();
-        gameObjects.add(hexBoard);
+        InitialBitmapBankData();
+        int numCols = BitmapBank.GetLibrary().size();
 
-        LinearLayout layout = findViewById(R.id.surface);
-        ViewGroup.LayoutParams params = layout.getLayoutParams();
-        params.height = width;
-        layout.setLayoutParams(params);
+        PanelBoard hexPalette = new PanelBoard(width,1,numCols);
+        List<IGameObject> paletteObjects = new ArrayList<>();
+        paletteObjects.add(hexPalette);
 
-        GameView gameView = new GameView(this,gameObjects);
-        gameView.AddTouchEventListener(hexBoard);
-        ((LinearLayout)findViewById(R.id.surface)).addView(gameView);
+        LinearLayout layoutPalette = findViewById(R.id.palette);
+        ViewGroup.LayoutParams paramsPalette = layoutPalette.getLayoutParams();
+        paramsPalette.height = (width/numCols) + 40;
+        layoutPalette.setLayoutParams(paramsPalette);
 
+        GameView gameViewPalette = new GameView(this,paletteObjects);
+        gameViewPalette.AddTouchEventListener(hexPalette);
+        ((LinearLayout)findViewById(R.id.palette)).addView(gameViewPalette);
+
+
+
+
+//        PanelBoard panelBoard = new PanelBoard(width,13);
+//        List<IGameObject> gameObjects = new ArrayList<>();
+//        gameObjects.add(panelBoard);
+//
+//        LinearLayout layout = findViewById(R.id.surface);
+//        ViewGroup.LayoutParams params = layout.getLayoutParams();
+//        params.height = width*2;
+//        layout.setLayoutParams(params);
+//
+//        GameView gameView = new GameView(this,gameObjects);
+//        gameView.AddTouchEventListener(panelBoard);
+
+        GameBoard gameBoard = new GameBoard(this,width,7,7);
+        ((LinearLayout)findViewById(R.id.surface)).addView(gameBoard);
+
+
+
+
+
+    }
+
+
+    private void InitialBitmapBankData(){
+        BitmapBank.InitInstance(this.getResources());
+        BitmapBank.AddBitmapToBank("next",R.drawable.next_arrow);
+        BitmapBank.AddBitmapToBank("knight",R.drawable.knight);
+        BitmapBank.AddBitmapToBank("arrow",R.drawable.arrow);
+        BitmapBank.AddBitmapToBank("pirate",R.drawable.pirate);
+        BitmapBank.AddBitmapToBank("drake",R.drawable.drake);
+        BitmapBank.AddBitmapToBank("mage",R.drawable.mage);
+        BitmapBank.AddBitmapToBank("ninja",R.drawable.ninja3);
     }
 
 }
