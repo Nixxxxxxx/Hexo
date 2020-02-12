@@ -6,13 +6,15 @@ import android.graphics.BitmapFactory;
 
 import org.stackwizards.coreengine.R;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BitmapBank {
 
     static Resources resources ;
-    static Map<String, Bitmap> bitmapMap ;
+    static List<MyBitMap> bitmapMap ;
 
     private static BitmapBank instance;
 
@@ -25,12 +27,17 @@ public class BitmapBank {
     public static void AddBitmapToBank(String name, int resourceId){
        Bitmap bitmap = BitmapFactory.decodeResource(resources, resourceId);
         bitmap = scaleImage(bitmap,120,120);
-        bitmapMap.put(name,bitmap);
+        bitmapMap.add(new MyBitMap(name,bitmap));
+    }
+
+    public static Bitmap GetBitmapFromResourceID(int resourceId){
+        Bitmap bitmap = BitmapFactory.decodeResource(resources, resourceId);
+        return scaleImage(bitmap,120,120);
     }
 
     private BitmapBank(Resources resources) {
         this.resources = resources;
-        bitmapMap = new HashMap<>();
+        bitmapMap = new ArrayList<>();
     }
 
     public static Bitmap scaleImage(Bitmap bitmap, int width, int height){
@@ -38,15 +45,25 @@ public class BitmapBank {
         return  resized;
     }
 
-    public static Bitmap GetBitmapWithName(String name){
-       if( !bitmapMap.containsValue(name)){
-           return null;
-       }else {
-           return bitmapMap.get(name);
-       }
+//    public static Bitmap GetBitmapWithName(String name){
+//       if( !bitmapMap.containsValue(name)){
+//           return null;
+//       }else {
+//           return bitmapMap.get(name);
+//       }
+//    }
+
+    public static  List<MyBitMap> GetLibrary(){
+        return bitmapMap;
     }
 
-    public static  Map<String, Bitmap> GetLibrary(){
-        return bitmapMap;
+    public static class MyBitMap{
+        public String name;
+        public Bitmap bitmap;
+
+        public MyBitMap(String name, Bitmap bitmap) {
+            this.name = name;
+            this.bitmap = bitmap;
+        }
     }
 }

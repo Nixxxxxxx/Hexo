@@ -10,6 +10,18 @@ public class PaintConstant {
     private static Paint paintCircle;
     private static Paint paintBlack;
 
+
+
+    private static Paint getFullWhite = paintFullWhite();
+
+    public static Paint paintFullWhite (){
+       Paint paint = new Paint();
+        paint.setColor(Color.WHITE);
+        paint.setTextSize(48);
+        paint.setStyle(Paint.Style.FILL);
+        return paint;
+    }
+
     public static Paint PaintBlack() {
         if(paintBlack==null) {
             paintBlack = new Paint();

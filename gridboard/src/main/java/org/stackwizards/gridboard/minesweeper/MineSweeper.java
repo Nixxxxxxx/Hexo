@@ -15,7 +15,7 @@ public class MineSweeper extends HexGridElement {
     private int deadlyNeighbours;
 
     public MineSweeper(int col, int row, float hexRadius) {
-        super(col, row, hexRadius);
+        super(col, row, hexRadius, 1);
     }
 
 

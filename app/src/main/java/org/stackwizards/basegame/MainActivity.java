@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
 //        gameView.AddTouchEventListener(panelBoard);
 
         GameBoard gameBoard = new GameBoard(this,width,7,7);
+        gameBoard.SetPanel(hexPalette);
         ((LinearLayout)findViewById(R.id.surface)).addView(gameBoard);
 
 

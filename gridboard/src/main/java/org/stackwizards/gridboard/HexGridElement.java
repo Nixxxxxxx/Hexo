@@ -26,10 +26,18 @@ public class HexGridElement implements IGameObject {
 
     private Paint paintCircle;
     protected Paint painBorder = null;
+    public int attack;
 
-    public HexGridElement(int col, int row, float hexRadius) {
+    public enum type {
+        decor,
+        panel,
+        figure
+    }
+
+    public HexGridElement(int col, int row, float hexRadius, int att) {
         this.col = col;
         this.row = row;
+        attack = att;
         this.hexRadius = hexRadius;
         this.sideLength = (float) (hexRadius / Math.cos(hexagonAngle));
         this.hexHeight = (float) (Math.sin(hexagonAngle) * sideLength);
@@ -75,8 +83,7 @@ public class HexGridElement implements IGameObject {
 //        } else {
 //            PaintConstant.PaintHexSelected().setStyle(Paint.Style.STROKE);
 //        }
-        canvas.drawCircle(X + hexRadius, Y + hexRadius + 6, hexHeight + 18, paintCircle);
-//        canvas.drawText("xx", X + (hexRadius/2), Y + hexRadius + 18, PaintConstant.PaintWhite());
+        canvas.drawCircle(X + hexRadius, Y + hexRadius + 10, hexHeight + 18, paintCircle);
     }
 
     @Override
@@ -105,6 +112,14 @@ public class HexGridElement implements IGameObject {
         return false;
     }
 
+    public void SetSelectedCircle(int color){
+        paintCircle.setColor(color);
+    }
+
+
+    public void UnSetSelectedCircle(int color){
+        paintCircle.setColor(color);
+    }
 
     public void ToggleFill(){
         if(isFill){
@@ -115,5 +130,9 @@ public class HexGridElement implements IGameObject {
             isFill = !isFill;
         }
 //        isFill = status;
+    }
+
+    public void SetPaintCircleColor(int color){
+        paintCircle.setColor(color);
     }
 }
