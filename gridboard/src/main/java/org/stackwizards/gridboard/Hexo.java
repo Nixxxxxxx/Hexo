@@ -32,9 +32,10 @@ public class Hexo extends HexGridElement {
         super.Draw(canvas);
         if (bitmap != null) {
             canvas.drawBitmap(bitmap, cX - (bitmap.getWidth() / 2), cY - (bitmap.getHeight() / 2), painBorder);
-            if(hexoType == type.panel)
+            if(hexoType == type.panel) {
+                canvas.drawText(attack+"", X + (hexRadius / 2), Y + hexRadius + 30, PaintConstant.paintFullWhite());
                 canvas.drawText(name, X + (hexRadius / 3), Y + hexRadius + 70, PaintConstant.paintFullWhite());
-            else if(hexoType == type.figure)
+            }else if(hexoType == type.figure)
                 canvas.drawText( PlayerName, X + (hexRadius / 3), Y + hexRadius + 70, PaintConstant.paintFullWhite());
         }
     }

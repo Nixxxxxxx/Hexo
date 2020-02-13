@@ -29,10 +29,14 @@ public class GameBoard extends View implements IGameObject, ITouchEventHandler, 
 
     private List<Bitmap> decorations = new ArrayList<>();
 
+    private int rows, cols;
+
     public GameBoard(Context context, int width, int rows, int cols) {
         super(context);
         setOnTouchListener(this);
         InitDecoationBitmap();
+        this.rows = rows;
+        this.cols = cols;
         priority = 0;
         isAlive = true;
         int index = 1;
@@ -134,9 +138,30 @@ public class GameBoard extends View implements IGameObject, ITouchEventHandler, 
                     panelBoard.chosen = null;
                     ((Hexo) hex).hexoType = HexGridElement.type.figure;
 
+                    Fight((Hexo) hex);
+
                 }
                 Log.i(GameConstant.TAG, "COL ROW touching me at: " + ((HexGridElement) hex).col + " " + ((HexGridElement) hex).row);
                 this.invalidate();
+            }
+        }
+    }
+
+    private void Fight(Hexo hex) {
+        List<Hexo> neightbours = GetNeighbours(hex);
+        for (Hexo hexo : neightbours) {
+            if (hexo.bitmap == null) {
+                hexo.SetPaintCircleColor(Color.CYAN);
+            }
+        }
+
+        for (Hexo hexo : neightbours) {
+            if (hexo.hexoType == HexGridElement.type.figure && !hexo.PlayerName.equals(panelBoard.currentPlayer.name)) {
+                if (hexo.attack < ((Hexo) hex).attack) {
+                    hexo.SetPaintCircleColor(panelBoard.currentPlayer.color);
+                    hexo.PlayerName = panelBoard.currentPlayer.name;
+                    Fight(hexo);
+                }
             }
         }
     }
@@ -149,6 +174,92 @@ public class GameBoard extends View implements IGameObject, ITouchEventHandler, 
 
     public void SetPanel(PanelBoard panelBoard) {
         this.panelBoard = panelBoard;
+    }
+
+    private List<Hexo> GetNeighbours(Hexo hexo) {
+        List<Hexo> neightbours = new ArrayList<>();
+        if (hexo.col == 0) {
+            neightbours.add(GetHex(hexo.row, hexo.col + 1));
+        } else if (hexo.col == cols - 1) {
+            neightbours.add(GetHex(hexo.row, hexo.col - 1));
+        } else {
+            neightbours.add(GetHex(hexo.row, hexo.col - 1));
+            neightbours.add(GetHex(hexo.row, hexo.col + 1));
+        }
+
+        if (hexo.row % 2 == 0) {
+            if (hexo.row == 0) {
+                if (hexo.col == 0) {
+                    neightbours.add(GetHex(1, 0));
+                } else if (hexo.col == cols - 1) {
+                    neightbours.add(GetHex(1, hexo.col));
+                    if (hexo.col % 2 == 0) {
+                        neightbours.add(GetHex(1, hexo.col - 1));
+                    }
+
+                }else {
+                    neightbours.add(GetHex(1, hexo.col));
+                    neightbours.add(GetHex(1, hexo.col - 1));
+                }
+            } else if (hexo.row == rows - 1) {
+                if (hexo.col == 0) {
+                    neightbours.add(GetHex(hexo.row - 1, 0));
+                } else if (hexo.col == cols - 1) {
+                    neightbours.add(GetHex(hexo.row - 1, cols - 1));
+                    if (cols % 2 == 1) {
+                        neightbours.add(GetHex(hexo.row - 1, cols - 2));
+                    }
+                } else {
+                    neightbours.add(GetHex(hexo.row - 1, hexo.col));
+                    neightbours.add(GetHex(hexo.row - 1, hexo.col - 1));
+                }
+            } else {
+                if (hexo.col == 0) {
+                    neightbours.add(GetHex(hexo.row - 1, 0));
+                    neightbours.add(GetHex(hexo.row - 1, 1));
+                } else if (hexo.col == cols - 1) {
+                    neightbours.add(GetHex(hexo.row - 1, cols - 1));
+                    if (cols % 2 == 1) {
+                        neightbours.add(GetHex(hexo.row - 1, cols - 2));
+                    }
+                } else {
+                    neightbours.add(GetHex(hexo.row - 1, hexo.col - 1));
+                    neightbours.add(GetHex(hexo.row - 1, hexo.col));
+                    neightbours.add(GetHex(hexo.row + 1, hexo.col - 1));
+                    neightbours.add(GetHex(hexo.row + 1, hexo.col));
+                }
+            }
+
+        } else {
+            if (hexo.row == rows - 1) {
+                if (hexo.col == 0) {
+                    neightbours.add(GetHex(hexo.row - 1, 0));
+                } else if (hexo.col == cols - 1) {
+                    neightbours.add(GetHex(hexo.row - 1, cols - 1));
+                    if (cols % 2 == 1) {
+                        neightbours.add(GetHex(hexo.row - 1, cols - 2));
+                    }
+                } else {
+                    neightbours.add(GetHex(hexo.row - 1, hexo.col));
+                    neightbours.add(GetHex(hexo.row - 1, hexo.col + 1));
+                }
+            } else {
+                if (hexo.col == 0) {
+                    neightbours.add(GetHex(hexo.row - 1, 0));
+                    neightbours.add(GetHex(hexo.row - 1, 1));
+                } else if (hexo.col == cols - 1) {
+                    neightbours.add(GetHex(hexo.row - 1, cols - 1));
+                    neightbours.add(GetHex(hexo.row - 1, cols - 2));
+                } else {
+                    neightbours.add(GetHex(hexo.row - 1, hexo.col + 1));
+                    neightbours.add(GetHex(hexo.row - 1, hexo.col));
+                    neightbours.add(GetHex(hexo.row + 1, hexo.col + 1));
+                    neightbours.add(GetHex(hexo.row + 1, hexo.col));
+                }
+            }
+        }
+
+        return neightbours;
     }
 
     private Hexo GetHex(int row, int col) {
