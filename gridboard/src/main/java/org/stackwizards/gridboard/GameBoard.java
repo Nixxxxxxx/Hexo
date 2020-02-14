@@ -26,7 +26,6 @@ public class GameBoard extends View implements IGameObject, ITouchEventHandler, 
     private List<IGameObject> hexs;
 
     private PanelBoard panelBoard;
-
     private List<Bitmap> decorations = new ArrayList<>();
 
     private int rows, cols;
@@ -126,6 +125,7 @@ public class GameBoard extends View implements IGameObject, ITouchEventHandler, 
                 ((HexGridElement) hex).ToggleFill();
                 if (panelBoard != null && panelBoard.chosen != null && !((Hexo) hex).isSet) {
 
+                    final Hexo HEXO = (Hexo)hex;
 
                     ((Hexo) hex).bitmap = panelBoard.chosen.bitmap;
                     ((Hexo) hex).attack = panelBoard.chosen.attack;
@@ -138,7 +138,7 @@ public class GameBoard extends View implements IGameObject, ITouchEventHandler, 
                     panelBoard.chosen = null;
                     ((Hexo) hex).hexoType = HexGridElement.type.figure;
 
-                    Fight((Hexo) hex);
+                    Fight( HEXO);
 
                 }
                 Log.i(GameConstant.TAG, "COL ROW touching me at: " + ((HexGridElement) hex).col + " " + ((HexGridElement) hex).row);
@@ -147,23 +147,39 @@ public class GameBoard extends View implements IGameObject, ITouchEventHandler, 
         }
     }
 
-    private void Fight(Hexo hex) {
-        List<Hexo> neightbours = GetNeighbours(hex);
-        for (Hexo hexo : neightbours) {
-            if (hexo.bitmap == null) {
-                hexo.SetPaintCircleColor(Color.CYAN);
-            }
-        }
 
-        for (Hexo hexo : neightbours) {
-            if (hexo.hexoType == HexGridElement.type.figure && !hexo.PlayerName.equals(panelBoard.currentPlayer.name)) {
-                if (hexo.attack < ((Hexo) hex).attack) {
-                    hexo.SetPaintCircleColor(panelBoard.currentPlayer.color);
-                    hexo.PlayerName = panelBoard.currentPlayer.name;
-                    Fight(hexo);
-                }
-            }
-        }
+
+    private void Fight(final Hexo hex) {
+        new java.util.Timer().schedule(
+                new java.util.TimerTask() {
+                    @Override
+                    public void run() {
+                        List<Hexo> neightbours = GetNeighbours(hex);
+                        for (Hexo hexo : neightbours) {
+                            if (hexo.bitmap == null) {
+                                hexo.SetPaintCircleColor(Color.CYAN);
+                            }
+                        }
+
+                        for (Hexo hexo : neightbours) {
+                            if (hexo.hexoType == HexGridElement.type.figure && !hexo.PlayerName.equals(panelBoard.currentPlayer.name)) {
+                                if (hexo.attack < ((Hexo) hex).attack) {
+                                    hexo.SetPaintCircleColor(panelBoard.currentPlayer.color);
+                                    hexo.PlayerName = panelBoard.currentPlayer.name;
+                                    final Hexo HexInner = hexo;
+                                    invalidMe();
+                                    Fight(HexInner);
+                                }
+                            }
+                        }
+                    }
+                },
+                1000
+        );
+    }
+
+    private void invalidMe(){
+        this.invalidate();
     }
 
     @Override
