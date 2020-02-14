@@ -13,6 +13,7 @@ import org.stackwizards.coreengine.GameConstant;
 import org.stackwizards.coreengine.Interfaces.IGameObject;
 import org.stackwizards.coreengine.Interfaces.ITouchEventHandler;
 import org.stackwizards.coreengine.PaintConstant;
+import org.stackwizards.soundbank.SoundBank;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,8 @@ public class GameBoard extends View implements IGameObject, ITouchEventHandler, 
 
     private int rows, cols;
 
+    private SoundBank soundBank;
+
     public GameBoard(Context context, int width, int rows, int cols) {
         super(context);
         setOnTouchListener(this);
@@ -40,6 +43,7 @@ public class GameBoard extends View implements IGameObject, ITouchEventHandler, 
         isAlive = true;
         int index = 1;
         hexs = new ArrayList<>();
+        soundBank = new SoundBank(context);
         int hexRadius = width / (2 * (cols + 1));
         for (int i = 0; i < cols; ++i) {
             for (int j = 0; j < rows; ++j) {
@@ -150,6 +154,7 @@ public class GameBoard extends View implements IGameObject, ITouchEventHandler, 
 
 
     private void Fight(final Hexo hex) {
+        soundBank.Play("appear");
         new java.util.Timer().schedule(
                 new java.util.TimerTask() {
                     @Override
