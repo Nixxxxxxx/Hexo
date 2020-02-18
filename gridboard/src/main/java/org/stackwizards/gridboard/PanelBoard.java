@@ -40,6 +40,9 @@ public class PanelBoard implements IGameObject, ITouchEventHandler {
 
     private GameBoard gameBoard;
 
+    int rounds = 1;
+    public int currentRoundMana = 1;
+
     public PanelBoard(int width, int rows, int cols) {
         priority = 0;
 //        player1 = Color.BLUE;
@@ -50,14 +53,16 @@ public class PanelBoard implements IGameObject, ITouchEventHandler {
         int index = 0;
         hexs = new ArrayList<>();
         int hexRadius = width / (2 * (cols + 1));
+        Random random = new Random();
         for (int i = 0; i < cols; ++i) {
             for (int j = 0; j < rows; ++j) {
-                Hexo hexGridElement = new Hexo(i, j, hexRadius, bitmaps.get(index++), index, HexGridElement.type.panel);
+                Hexo hexGridElement = new Hexo(i, j, hexRadius, bitmaps.get(index++), random.nextInt(4) + 1, HexGridElement.type.panel);
                 hexGridElement.SetPaintBorder(PaintConstant.PaintWhite());
                 hexs.add(hexGridElement);
 
             }
         }
+        SetAvailableUnits();
     }
 
     public PanelBoard(int width, int rows) {
@@ -87,7 +92,7 @@ public class PanelBoard implements IGameObject, ITouchEventHandler {
 
     }
 
-    public void SetGameBoard(GameBoard gameBoard){
+    public void SetGameBoard(GameBoard gameBoard) {
         this.gameBoard = gameBoard;
     }
 
@@ -126,24 +131,39 @@ public class PanelBoard implements IGameObject, ITouchEventHandler {
         }
     }
 
+    public void SetAvailableUnits() {
+        for (IGameObject obj : hexs) {
+            if (((Hexo) obj).attack <= currentRoundMana) {
+                ((Hexo) obj).SetPaintCircleColor(currentPlayer.color);
+            } else {
+                ((Hexo) obj).SetPaintCircleColor(Color.GRAY);
+            }
+        }
+
+    }
+
     @Override
     public void TouchPosition(int x, int y) {
         Log.i(GameConstant.TAG, "Someone touching me at: " + x + " " + y);
         for (IGameObject hex : hexs) {
             if (((HexGridElement) hex).getSelectedHexGrid(x, y)) {
                 if (((Hexo) hex).name.equals("next")) {
-
-                   SwitchPlayer();
+                    rounds++;
+                    currentRoundMana = rounds;
+                    SwitchPlayer();
+                    SetAvailableUnits();
 //                    DeselectAllPanels(player1);
-                    DeselectAllPanels(currentPlayer.color);
                 } else {
-                    DeselectAllPanels(currentPlayer.color);
-//                    DeselectAllPanels(player1);
-                    ((HexGridElement) hex).SetSelectedCircle(Color.GREEN);
-                    chosen = (Hexo) hex;
+                    SetAvailableUnits();
+                    if (currentRoundMana >= ((Hexo) hex).attack) {
+//                        DeselectAllPanels(currentPlayer.color);
+                        chosen = (Hexo) hex;
+                        ((HexGridElement) hex).SetSelectedCircle(Color.GREEN);
+
+                    }
                 }
 
-                if(gameBoard != null){
+                if (gameBoard != null) {
                     gameBoard.ResetFreePanels();
                     gameBoard.GetFreePlayerPanels();
                     gameBoard.invalidate();

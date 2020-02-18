@@ -140,14 +140,14 @@ public class GameBoard extends View implements IGameObject, ITouchEventHandler, 
 
                     ((Hexo) hex).bitmap = panelBoard.chosen.bitmap;
                     ((Hexo) hex).attack = panelBoard.chosen.attack;
-                    panelBoard.DeselectAllPanels(panelBoard.currentPlayer.color);
                     ((HexGridElement) hex).SetSelectedCircle(panelBoard.currentPlayer.color);
-
                     ((Hexo) hex).isSet = true;
                     ((Hexo) hex).name = panelBoard.chosen.name;
                     ((Hexo) hex).PlayerName = panelBoard.currentPlayer.name;
-                    panelBoard.chosen = null;
                     ((Hexo) hex).hexoType = HexGridElement.type.figure;
+                    panelBoard.currentRoundMana -= ((Hexo) hex).attack;
+                    panelBoard.SetAvailableUnits();
+                    panelBoard.chosen = null;
                     Fight(HEXO);
 
                 }
