@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         GameBoard gameBoard = new GameBoard(this,width,7,7);
         gameBoard.SetPanel(hexPalette);
         ((LinearLayout)findViewById(R.id.surface)).addView(gameBoard);
-
+        hexPalette.SetGameBoard(gameBoard);
 
 
 

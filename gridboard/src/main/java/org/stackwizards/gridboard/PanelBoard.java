@@ -38,6 +38,8 @@ public class PanelBoard implements IGameObject, ITouchEventHandler {
 
     private boolean turn;
 
+    private GameBoard gameBoard;
+
     public PanelBoard(int width, int rows, int cols) {
         priority = 0;
 //        player1 = Color.BLUE;
@@ -85,6 +87,9 @@ public class PanelBoard implements IGameObject, ITouchEventHandler {
 
     }
 
+    public void SetGameBoard(GameBoard gameBoard){
+        this.gameBoard = gameBoard;
+    }
 
     private static <K, V> List<V> createListFromMapEntries(Map<K, V> map) {
         return (List<V>) map.values().stream().collect(Collectors.toList());
@@ -115,7 +120,7 @@ public class PanelBoard implements IGameObject, ITouchEventHandler {
         return priority;
     }
 
-    public void DeselectAllPanels(int color){
+    public void DeselectAllPanels(int color) {
         for (IGameObject obj : hexs) {
             ((HexGridElement) obj).UnSetSelectedCircle(color);
         }
@@ -126,29 +131,29 @@ public class PanelBoard implements IGameObject, ITouchEventHandler {
         Log.i(GameConstant.TAG, "Someone touching me at: " + x + " " + y);
         for (IGameObject hex : hexs) {
             if (((HexGridElement) hex).getSelectedHexGrid(x, y)) {
-                if(((Hexo)hex).name.equals("next")){
+                if (((Hexo) hex).name.equals("next")) {
 
-                    if(turn){
-//                        player1 = Color.BLUE;
-                        currentPlayer = player1;
-                    }else {
-//                        player1 = Color.RED;
-                        currentPlayer = player2;
-                    }
-                    turn = !turn;
+                   SwitchPlayer();
 //                    DeselectAllPanels(player1);
                     DeselectAllPanels(currentPlayer.color);
-                }else {
+                } else {
                     DeselectAllPanels(currentPlayer.color);
 //                    DeselectAllPanels(player1);
                     ((HexGridElement) hex).SetSelectedCircle(Color.GREEN);
                     chosen = (Hexo) hex;
                 }
 
-
-
+                if(gameBoard != null){
+                    gameBoard.ResetFreePanels();
+                    gameBoard.GetFreePlayerPanels();
+                    gameBoard.invalidate();
+                }
             }
         }
+    }
+
+    private void SwitchPlayer() {
+        currentPlayer = currentPlayer.equals(player1) ? player2 : player1;
     }
 
     private MineSweeper GetHex(int row, int col) {

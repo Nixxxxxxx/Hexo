@@ -47,7 +47,7 @@ public class GameBoard extends View implements IGameObject, ITouchEventHandler, 
         int hexRadius = width / (2 * (cols + 1));
         for (int i = 0; i < cols; ++i) {
             for (int j = 0; j < rows; ++j) {
-                Hexo hexGridElement = new Hexo(i, j, hexRadius, new BitmapBank.MyBitMap("p1", null), 0, HexGridElement.type.decor);
+                Hexo hexGridElement = new Hexo(i, j, hexRadius, new BitmapBank.MyBitMap("p1", null), 0, HexGridElement.type.panel);
                 hexGridElement.SetPaintBorder(PaintConstant.PaintBlack());
                 hexs.add(hexGridElement);
                 Log.i(GameConstant.TAG, "Created element me at: " + hexGridElement.cX + " " + hexGridElement.cY);
@@ -67,6 +67,7 @@ public class GameBoard extends View implements IGameObject, ITouchEventHandler, 
                 hexo.isSet = true;
                 decoartionNum--;
                 hexo.bitmap = decorations.get(random.nextInt(decorations.size()));
+                hexo.hexoType = HexGridElement.type.decor;
                 hexo.SetPaintCircleColor(Color.GRAY);
             }
         }
@@ -126,10 +127,16 @@ public class GameBoard extends View implements IGameObject, ITouchEventHandler, 
     public void TouchPosition(int x, int y) {
         for (IGameObject hex : hexs) {
             if (((HexGridElement) hex).getSelectedHexGrid(x, y)) {
-                ((HexGridElement) hex).ToggleFill();
-                if (panelBoard != null && panelBoard.chosen != null && !((Hexo) hex).isSet) {
+                ResetFreePanels();
 
-                    final Hexo HEXO = (Hexo)hex;
+                ((HexGridElement) hex).ToggleFill();
+
+               List<Hexo> freePanels =  GetFreePlayerPanels();
+
+
+                if (panelBoard != null && panelBoard.chosen != null && !((Hexo) hex).isSet && ((Hexo) hex).isFree && freePanels.contains((Hexo) hex)) {
+
+                    final Hexo HEXO = (Hexo) hex;
 
                     ((Hexo) hex).bitmap = panelBoard.chosen.bitmap;
                     ((Hexo) hex).attack = panelBoard.chosen.attack;
@@ -141,31 +148,78 @@ public class GameBoard extends View implements IGameObject, ITouchEventHandler, 
                     ((Hexo) hex).PlayerName = panelBoard.currentPlayer.name;
                     panelBoard.chosen = null;
                     ((Hexo) hex).hexoType = HexGridElement.type.figure;
-
-                    Fight( HEXO);
+                    Fight(HEXO);
 
                 }
                 Log.i(GameConstant.TAG, "COL ROW touching me at: " + ((HexGridElement) hex).col + " " + ((HexGridElement) hex).row);
-                this.invalidate();
             }
         }
+        this.invalidate();
+    }
+
+    public void ResetFreePanels() {
+        for (IGameObject h : hexs) {
+            Hexo he = (Hexo) h;
+            if (he.hexoType.equals(HexGridElement.type.panel) && !he.isSet) {
+                he.SetPaintCircleColor(Color.GRAY);
+            }
+        }
+        this.invalidate();
+    }
+
+    public List<Hexo> GetAllFreePanels() {
+        List<Hexo> freePanels = new ArrayList<>();
+        for (IGameObject h : hexs) {
+            Hexo he = (Hexo) h;
+            if (!he.isSet && he.hexoType.equals(HexGridElement.type.panel)) {
+                he.isFree = true;
+                he.SetPaintCircleColor(Color.GREEN);
+                freePanels.add(he);
+            }
+        }
+        return freePanels;
+    }
+
+    public List<Hexo> GetCurrentPlayerUnits() {
+        List<Hexo> units = new ArrayList<>();
+        for (IGameObject h : hexs) {
+            Hexo he = (Hexo) h;
+            if (he.PlayerName.equals(panelBoard.currentPlayer.name) && he.isSet && he.hexoType.equals(HexGridElement.type.figure)) {
+                he.isFree = true;
+                units.add(he);
+            }
+        }
+        return units;
     }
 
 
+    public List<Hexo> GetFreePlayerPanels() {
+        if (GetCurrentPlayerUnits().size() == 0) {
+            return GetAllFreePanels();
+        }
+
+        List<Hexo> units = new ArrayList<>();
+        for (Hexo h : GetCurrentPlayerUnits()) {
+            for (Hexo hi : GetNeighbours(h)) {
+                if (!hi.isSet && hi.hexoType.equals(HexGridElement.type.panel) && !units.contains(hi)) {
+                    hi.SetPaintCircleColor(Color.GREEN);
+                    units.add(hi);
+                }
+            }
+        }
+        return units;
+    }
+
 
     private void Fight(final Hexo hex) {
+        ResetFreePanels();
+        GetFreePlayerPanels();
         soundBank.Play("appear");
         new java.util.Timer().schedule(
                 new java.util.TimerTask() {
                     @Override
                     public void run() {
                         List<Hexo> neightbours = GetNeighbours(hex);
-                        for (Hexo hexo : neightbours) {
-                            if (hexo.bitmap == null) {
-                                hexo.SetPaintCircleColor(Color.CYAN);
-                            }
-                        }
-
                         for (Hexo hexo : neightbours) {
                             if (hexo.hexoType == HexGridElement.type.figure && !hexo.PlayerName.equals(panelBoard.currentPlayer.name)) {
                                 if (hexo.attack < ((Hexo) hex).attack) {
@@ -181,9 +235,10 @@ public class GameBoard extends View implements IGameObject, ITouchEventHandler, 
                 },
                 1000
         );
+        this.invalidate();
     }
 
-    private void invalidMe(){
+    private void invalidMe() {
         this.invalidate();
     }
 
@@ -218,7 +273,7 @@ public class GameBoard extends View implements IGameObject, ITouchEventHandler, 
                         neightbours.add(GetHex(1, hexo.col - 1));
                     }
 
-                }else {
+                } else {
                     neightbours.add(GetHex(1, hexo.col));
                     neightbours.add(GetHex(1, hexo.col - 1));
                 }
@@ -250,7 +305,6 @@ public class GameBoard extends View implements IGameObject, ITouchEventHandler, 
                     neightbours.add(GetHex(hexo.row + 1, hexo.col));
                 }
             }
-
         } else {
             if (hexo.row == rows - 1) {
                 if (hexo.col == 0) {

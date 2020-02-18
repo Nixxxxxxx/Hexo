@@ -27,6 +27,7 @@ public class HexGridElement implements IGameObject {
     private Paint paintCircle;
     protected Paint painBorder = null;
     public int attack;
+    public boolean isFree = true;
 
     public enum type {
         decor,
