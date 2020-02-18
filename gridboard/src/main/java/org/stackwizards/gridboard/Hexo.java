@@ -33,13 +33,15 @@ public class Hexo extends HexGridElement {
         if (bitmap != null) {
             canvas.drawBitmap(bitmap, cX - (bitmap.getWidth() / 2), cY - (bitmap.getHeight() / 2), painBorder);
             if(name.equals("next")) {
-                canvas.drawText(attack+"", X + (hexRadius / 2), Y + hexRadius + 40, PaintConstant.paintFullWhite());
+//                canvas.drawText(attack+"", X + (hexRadius / 2), Y + hexRadius + 40, PaintConstant.paintFullWhite());
 //                canvas.drawText(name, X + (hexRadius / 3), Y + hexRadius + 70, PaintConstant.paintFullWhite());
-            } if(hexoType == type.panel) {
+            }
+            else if(hexoType == type.panel) {
                 canvas.drawText(attack+"", X + (hexRadius / 2), Y + hexRadius + 30, PaintConstant.paintFullWhite());
 //                canvas.drawText(name, X + (hexRadius / 3), Y + hexRadius + 70, PaintConstant.paintFullWhite());
-            }else if(hexoType == type.figure)
-                canvas.drawText( PlayerName, X + (hexRadius / 3), Y + hexRadius + 70, PaintConstant.paintFullWhite());
+            }
+//            else if(hexoType == type.figure)
+//                canvas.drawText( PlayerName, X + (hexRadius / 3), Y + hexRadius + 70, PaintConstant.paintFullWhite());
         }
     }
 

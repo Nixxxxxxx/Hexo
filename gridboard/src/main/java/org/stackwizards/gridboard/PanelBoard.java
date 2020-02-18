@@ -42,6 +42,7 @@ public class PanelBoard implements IGameObject, ITouchEventHandler {
 
     int rounds = 1;
     public int currentRoundMana = 1;
+    public boolean enableNext = true;
 
     public PanelBoard(int width, int rows, int cols) {
         priority = 0;
@@ -147,9 +148,10 @@ public class PanelBoard implements IGameObject, ITouchEventHandler {
         Log.i(GameConstant.TAG, "Someone touching me at: " + x + " " + y);
         for (IGameObject hex : hexs) {
             if (((HexGridElement) hex).getSelectedHexGrid(x, y)) {
-                if (((Hexo) hex).name.equals("next")) {
+                if (((Hexo) hex).name.equals("next") && enableNext) {
                     rounds++;
                     currentRoundMana = rounds;
+//                    enableNext = false;
                     SwitchPlayer();
                     SetAvailableUnits();
 //                    DeselectAllPanels(player1);

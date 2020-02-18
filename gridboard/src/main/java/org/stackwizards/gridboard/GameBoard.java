@@ -32,6 +32,7 @@ public class GameBoard extends View implements IGameObject, ITouchEventHandler, 
     private int rows, cols;
 
     private SoundBank soundBank;
+    private Player localPlayer;
 
     public GameBoard(Context context, int width, int rows, int cols) {
         super(context);
@@ -138,18 +139,18 @@ public class GameBoard extends View implements IGameObject, ITouchEventHandler, 
 
                     final Hexo HEXO = (Hexo) hex;
 
+                    localPlayer = panelBoard.currentPlayer;
                     ((Hexo) hex).bitmap = panelBoard.chosen.bitmap;
                     ((Hexo) hex).attack = panelBoard.chosen.attack;
-                    ((HexGridElement) hex).SetSelectedCircle(panelBoard.currentPlayer.color);
+                    ((HexGridElement) hex).SetSelectedCircle(localPlayer.color);
                     ((Hexo) hex).isSet = true;
                     ((Hexo) hex).name = panelBoard.chosen.name;
-                    ((Hexo) hex).PlayerName = panelBoard.currentPlayer.name;
+                    ((Hexo) hex).PlayerName = localPlayer.name;
                     ((Hexo) hex).hexoType = HexGridElement.type.figure;
                     panelBoard.currentRoundMana -= ((Hexo) hex).attack;
                     panelBoard.SetAvailableUnits();
                     panelBoard.chosen = null;
                     Fight(HEXO);
-
                 }
                 Log.i(GameConstant.TAG, "COL ROW touching me at: " + ((HexGridElement) hex).col + " " + ((HexGridElement) hex).row);
             }
@@ -221,10 +222,10 @@ public class GameBoard extends View implements IGameObject, ITouchEventHandler, 
                     public void run() {
                         List<Hexo> neightbours = GetNeighbours(hex);
                         for (Hexo hexo : neightbours) {
-                            if (hexo.hexoType == HexGridElement.type.figure && !hexo.PlayerName.equals(panelBoard.currentPlayer.name)) {
+                            if (hexo.hexoType == HexGridElement.type.figure && !hexo.PlayerName.equals(localPlayer.name)) {
                                 if (hexo.attack < ((Hexo) hex).attack) {
-                                    hexo.SetPaintCircleColor(panelBoard.currentPlayer.color);
-                                    hexo.PlayerName = panelBoard.currentPlayer.name;
+                                    hexo.SetPaintCircleColor(localPlayer.color);
+                                    hexo.PlayerName = localPlayer.name;
                                     final Hexo HexInner = hexo;
                                     invalidMe();
                                     Fight(HexInner);
@@ -318,13 +319,16 @@ public class GameBoard extends View implements IGameObject, ITouchEventHandler, 
                     neightbours.add(GetHex(hexo.row - 1, hexo.col));
                     neightbours.add(GetHex(hexo.row - 1, hexo.col + 1));
                 }
-            } else {
+            }
+            else {
                 if (hexo.col == 0) {
                     neightbours.add(GetHex(hexo.row - 1, 0));
                     neightbours.add(GetHex(hexo.row - 1, 1));
+                    neightbours.add(GetHex(hexo.row + 1, 0));
+                    neightbours.add(GetHex(hexo.row + 1, 1));
                 } else if (hexo.col == cols - 1) {
-                    neightbours.add(GetHex(hexo.row - 1, cols - 1));
-                    neightbours.add(GetHex(hexo.row - 1, cols - 2));
+                    neightbours.add(GetHex(hexo.row - 1, hexo.col));
+                    neightbours.add(GetHex(hexo.row + 1, hexo.col));
                 } else {
                     neightbours.add(GetHex(hexo.row - 1, hexo.col + 1));
                     neightbours.add(GetHex(hexo.row - 1, hexo.col));
