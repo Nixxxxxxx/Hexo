@@ -18,9 +18,12 @@ public class BitmapBank {
 
     private static BitmapBank instance;
 
+    public static Bitmap spriteSheet;
+
     public static void InitInstance(Resources resources){
         if(instance == null){
             instance = new BitmapBank(resources);
+            spriteSheet = BitmapFactory.decodeResource(resources, R.drawable.base_grid);
         }
     }
 
@@ -52,6 +55,10 @@ public class BitmapBank {
 //           return bitmapMap.get(name);
 //       }
 //    }
+
+    public static Bitmap Crop(Bitmap bmp, int x, int y, int width, int height){
+        return Bitmap.createBitmap(bmp, x,y,width, height);
+    }
 
     public static  List<MyBitMap> GetLibrary(){
         return bitmapMap;

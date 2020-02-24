@@ -1,109 +1,47 @@
 package org.stackwizards.gridboard;
 
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.util.Log;
 
-import org.stackwizards.GameCore;
-import org.stackwizards.bitmap.BitmapBank;
 import org.stackwizards.coreengine.GameConstant;
 import org.stackwizards.coreengine.Interfaces.IGameObject;
 import org.stackwizards.coreengine.Interfaces.ITouchEventHandler;
-import org.stackwizards.coreengine.PaintConstant;
-import org.stackwizards.gridboard.minesweeper.MineSweeper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.stream.Collectors;
-
-import static java.lang.StrictMath.abs;
 
 public class PanelBoard implements IGameObject, ITouchEventHandler {
     private int priority;
     private boolean isAlive;
-    private List<IGameObject> hexs;
-
-//    public int player1;
-
-    public Player currentPlayer = null;
-
-    private Player player1 = new Player("Fred", Color.BLUE);
-    private Player player2 = new Player("Jimmy", Color.RED);
+    private GameBoard gameBoard;
+    private Player firstPlayer;
+    private Player secondPlayer;
 
     public Hexo chosen;
-
-    private boolean turn;
-
-    private GameBoard gameBoard;
-
-    int rounds = 1;
+    public Player currentPlayer = null;
+    public int rounds = 1;
     public int currentRoundMana = 1;
     public boolean enableNext = true;
 
-    public PanelBoard(int width, int rows, int cols) {
+    public PanelBoard(Player firstPlayer,Player secondPlayer) {
         priority = 0;
-//        player1 = Color.BLUE;
-        currentPlayer = player1;
+        this.firstPlayer = firstPlayer;
+        this.secondPlayer = secondPlayer;
+        currentPlayer = firstPlayer;
         isAlive = true;
-        turn = false;
-        List<BitmapBank.MyBitMap> bitmaps = BitmapBank.GetLibrary();
-        int index = 0;
-        hexs = new ArrayList<>();
-        int hexRadius = width / (2 * (cols + 1));
-        Random random = new Random();
-        for (int i = 0; i < cols; ++i) {
-            for (int j = 0; j < rows; ++j) {
-                Hexo hexGridElement = new Hexo(i, j, hexRadius, bitmaps.get(index++), random.nextInt(4) + 1, HexGridElement.type.panel);
-                hexGridElement.SetPaintBorder(PaintConstant.PaintWhite());
-                hexs.add(hexGridElement);
-
-            }
-        }
         SetAvailableUnits();
-    }
-
-    public PanelBoard(int width, int rows) {
-        priority = 0;
-        isAlive = true;
-        hexs = new ArrayList<>();
-        int cols = rows;
-        int hexRadius = width / (2 * (cols + 1));
-        for (int i = 0; i < cols; ++i) {
-            for (int j = 0; j < rows; ++j) {
-                MineSweeper hexGridElement = new MineSweeper(i, j, hexRadius);
-                hexs.add(hexGridElement);
-            }
-        }
-
-        int r = 10;
-        Random rand = new Random();
-        while (r > 0) {
-            int col = rand.nextInt(cols);
-            int row = rand.nextInt(rows);
-            MineSweeper element = GetHex(row, col);
-            if (!element.isDeadly()) {
-                element.setDeadly(true);
-                r--;
-            }
-        }
-
     }
 
     public void SetGameBoard(GameBoard gameBoard) {
         this.gameBoard = gameBoard;
     }
 
-    private static <K, V> List<V> createListFromMapEntries(Map<K, V> map) {
-        return (List<V>) map.values().stream().collect(Collectors.toList());
-    }
+//    private static <K, V> List<V> createListFromMapEntries(Map<K, V> map) {
+//        return (List<V>) map.values().stream().collect(Collectors.toList());
+//    }
 
     @Override
     public void Update() {
-        for (IGameObject hex : hexs) {
+        for (IGameObject hex : currentPlayer.hexs) {
             hex.Update();
         }
     }
@@ -111,7 +49,7 @@ public class PanelBoard implements IGameObject, ITouchEventHandler {
     @Override
     public void Draw(Canvas canvas) {
 
-        for (IGameObject hex : hexs) {
+        for (IGameObject hex : currentPlayer.hexs) {
             hex.Draw(canvas);
         }
     }
@@ -127,17 +65,17 @@ public class PanelBoard implements IGameObject, ITouchEventHandler {
     }
 
     public void DeselectAllPanels(int color) {
-        for (IGameObject obj : hexs) {
+        for (IGameObject obj : currentPlayer.hexs) {
             ((HexGridElement) obj).UnSetSelectedCircle(color);
         }
     }
 
     public void SetAvailableUnits() {
-        for (IGameObject obj : hexs) {
-            if (((Hexo) obj).attack <= currentRoundMana) {
-                ((Hexo) obj).SetPaintCircleColor(currentPlayer.color);
+        for (Hexo obj : currentPlayer.hexs) {
+            if (obj.attack <= currentRoundMana) {
+                obj.SetPaintCircleColor(currentPlayer.color);
             } else {
-                ((Hexo) obj).SetPaintCircleColor(Color.GRAY);
+                obj.SetPaintCircleColor(Color.GRAY);
             }
         }
 
@@ -146,9 +84,9 @@ public class PanelBoard implements IGameObject, ITouchEventHandler {
     @Override
     public void TouchPosition(int x, int y) {
         Log.i(GameConstant.TAG, "Someone touching me at: " + x + " " + y);
-        for (IGameObject hex : hexs) {
-            if (((HexGridElement) hex).getSelectedHexGrid(x, y)) {
-                if (((Hexo) hex).name.equals("next") && enableNext) {
+        for (Hexo hex : currentPlayer.hexs) {
+            if (hex.getSelectedHexGrid(x, y)) {
+                if (hex.name.equals("next") && enableNext) {
                     rounds++;
                     currentRoundMana = rounds;
 //                    enableNext = false;
@@ -157,10 +95,10 @@ public class PanelBoard implements IGameObject, ITouchEventHandler {
 //                    DeselectAllPanels(player1);
                 } else {
                     SetAvailableUnits();
-                    if (currentRoundMana >= ((Hexo) hex).attack) {
+                    if (currentRoundMana >= hex.attack) {
 //                        DeselectAllPanels(currentPlayer.color);
-                        chosen = (Hexo) hex;
-                        ((HexGridElement) hex).SetSelectedCircle(Color.GREEN);
+                        chosen = hex;
+                        hex.SetSelectedCircle(Color.GREEN);
 
                     }
                 }
@@ -175,17 +113,7 @@ public class PanelBoard implements IGameObject, ITouchEventHandler {
     }
 
     private void SwitchPlayer() {
-        currentPlayer = currentPlayer.equals(player1) ? player2 : player1;
-    }
-
-    private MineSweeper GetHex(int row, int col) {
-        for (IGameObject hex : hexs) {
-            if (((HexGridElement) hex).isHexGrid(row, col)) {
-                GameCore.soundBank.Play("hit");
-                return ((MineSweeper) hex);
-            }
-        }
-        return null;
+        currentPlayer = currentPlayer.equals(firstPlayer) ? secondPlayer : firstPlayer;
     }
 
 }

@@ -26,6 +26,13 @@ public class Hexo extends HexGridElement {
         isSet = false;
         hexoType = t;
     }
+    public Hexo(int col, int row, float hexRadius, Bitmap bitmap, int att, type t) {
+        super(col, row, hexRadius, att);
+        this.bitmap = bitmap;
+        this.name = "";
+        isSet = false;
+        hexoType = t;
+    }
 
     @Override
     public void Draw(Canvas canvas) {
